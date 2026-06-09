@@ -1,0 +1,16 @@
+.env
+.bundle
+/vendor/bundle
+/log/*
+/tmp/*
+/storage/*
+!/storage/.keep
+/public/system
+/node_modules
+/yarn-error.log
+.byebug_history
+.DS_Store
+/db/*.sqlite3
+/db/*.sqlite3-journal
+/*.swp
+*~

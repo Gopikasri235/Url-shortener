@@ -1,0 +1,10 @@
+<h1>Short URL report</h1>
+<p>Hello <%= @owner.email %>,</p>
+<p>Here are the latest details for your short URL:</p>
+<ul>
+  <li><strong>Original URL:</strong> <%= @short_url.url %></li>
+  <li><strong>Short URL:</strong> <a href="<%= @short_url_link %>"><%= @short_url_link %></a></li>
+  <li><strong>Code:</strong> <%= @short_url.code %></li>
+  <li><strong>Total clicks:</strong> <%= @click_count %></li>
+</ul>
+<p>Thank you,<br>URL Shortener Team</p>

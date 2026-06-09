@@ -1,0 +1,776 @@
+  [1m[36mUser Load (0.2ms)[0m  [1m[34mSELECT "users".* FROM "users" ORDER BY "users"."id" DESC LIMIT ?[0m  [["LIMIT", 1]]
+  [1m[35m (0.2ms)[0m  [1m[35mCREATE TABLE "schema_migrations" ("version" varchar NOT NULL PRIMARY KEY)[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE TABLE "ar_internal_metadata" ("key" varchar NOT NULL PRIMARY KEY, "value" varchar, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL)[0m
+  [1m[36mActiveRecord::InternalMetadata Load (0.0ms)[0m  [1m[34mSELECT * FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = ? ORDER BY "ar_internal_metadata"."key" ASC LIMIT 1[0m  [[nil, "environment"]]
+  [1m[36mActiveRecord::InternalMetadata Create (0.1ms)[0m  [1m[32mINSERT INTO "ar_internal_metadata" ("key", "value", "created_at", "updated_at") VALUES ('environment', 'development', '2026-06-08 07:42:50.846628', '2026-06-08 07:42:50.846630') RETURNING "key"[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.0ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Migrating to DeviseCreateUsers (20260607145853)
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mbegin transaction[0m
+  [1m[35m (0.5ms)[0m  [1m[35mCREATE TABLE "users" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "email" varchar DEFAULT '' NOT NULL, "encrypted_password" varchar DEFAULT '' NOT NULL, "reset_password_token" varchar, "reset_password_sent_at" datetime(6), "remember_created_at" datetime(6), "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL)[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE UNIQUE INDEX "index_users_on_email" ON "users" ("email")[0m
+  [1m[35m (0.0ms)[0m  [1m[35mCREATE UNIQUE INDEX "index_users_on_reset_password_token" ON "users" ("reset_password_token")[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.0ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20260607145853') RETURNING "version"[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mcommit transaction[0m
+Migrating to CreateDoorkeeperTables (20260607151031)
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mbegin transaction[0m
+  [1m[35m (0.4ms)[0m  [1m[35mCREATE TABLE "oauth_access_tokens" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "resource_owner_id" integer, "token" varchar NOT NULL, "refresh_token" varchar, "expires_in" integer, "scopes" varchar, "created_at" datetime(6) NOT NULL, "revoked_at" datetime(6), "previous_refresh_token" varchar DEFAULT '' NOT NULL)[0m
+  [1m[35m (0.0ms)[0m  [1m[35mCREATE INDEX "index_oauth_access_tokens_on_resource_owner_id" ON "oauth_access_tokens" ("resource_owner_id")[0m
+  [1m[35m (0.0ms)[0m  [1m[35mCREATE UNIQUE INDEX "index_oauth_access_tokens_on_token" ON "oauth_access_tokens" ("token")[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE UNIQUE INDEX "index_oauth_access_tokens_on_refresh_token" ON "oauth_access_tokens" ("refresh_token")[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA foreign_keys[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA defer_foreign_keys[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA defer_foreign_keys = ON[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA foreign_keys = OFF[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE TEMPORARY TABLE "aoauth_access_tokens" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "resource_owner_id" integer DEFAULT NULL, "token" varchar NOT NULL, "refresh_token" varchar DEFAULT NULL, "expires_in" integer DEFAULT NULL, "scopes" varchar DEFAULT NULL, "created_at" datetime(6) NOT NULL, "revoked_at" datetime(6) DEFAULT NULL, "previous_refresh_token" varchar DEFAULT '' NOT NULL)[0m
+  [1m[35m (0.0ms)[0m  [1m[35mCREATE UNIQUE INDEX "tindex_aoauth_access_tokens_on_refresh_token" ON "aoauth_access_tokens" ("refresh_token")[0m
+  [1m[35m (0.0ms)[0m  [1m[35mCREATE UNIQUE INDEX "tindex_aoauth_access_tokens_on_token" ON "aoauth_access_tokens" ("token")[0m
+  [1m[35m (0.0ms)[0m  [1m[35mCREATE INDEX "tindex_aoauth_access_tokens_on_resource_owner_id" ON "aoauth_access_tokens" ("resource_owner_id")[0m
+  [1m[35m (0.0ms)[0m  [1m[32mINSERT INTO "aoauth_access_tokens" ("id","resource_owner_id","token","refresh_token","expires_in","scopes","created_at","revoked_at","previous_refresh_token")
+                     SELECT "id","resource_owner_id","token","refresh_token","expires_in","scopes","created_at","revoked_at","previous_refresh_token" FROM "oauth_access_tokens"[0m
+  [1m[35m (0.1ms)[0m  [1m[35mDROP TABLE "oauth_access_tokens"[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE TABLE "oauth_access_tokens" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "resource_owner_id" integer DEFAULT NULL, "token" varchar NOT NULL, "refresh_token" varchar DEFAULT NULL, "expires_in" integer DEFAULT NULL, "scopes" varchar DEFAULT NULL, "created_at" datetime(6) NOT NULL, "revoked_at" datetime(6) DEFAULT NULL, "previous_refresh_token" varchar DEFAULT '' NOT NULL, CONSTRAINT "fk_rails_ee63f25419"
+FOREIGN KEY ("resource_owner_id")
+  REFERENCES "users" ("id")
+)[0m
+  [1m[35m (0.0ms)[0m  [1m[35mCREATE INDEX "index_oauth_access_tokens_on_resource_owner_id" ON "oauth_access_tokens" ("resource_owner_id")[0m
+  [1m[35m (0.0ms)[0m  [1m[35mCREATE UNIQUE INDEX "index_oauth_access_tokens_on_token" ON "oauth_access_tokens" ("token")[0m
+  [1m[35m (0.0ms)[0m  [1m[35mCREATE UNIQUE INDEX "index_oauth_access_tokens_on_refresh_token" ON "oauth_access_tokens" ("refresh_token")[0m
+  [1m[35m (0.0ms)[0m  [1m[32mINSERT INTO "oauth_access_tokens" ("id","resource_owner_id","token","refresh_token","expires_in","scopes","created_at","revoked_at","previous_refresh_token")
+                     SELECT "id","resource_owner_id","token","refresh_token","expires_in","scopes","created_at","revoked_at","previous_refresh_token" FROM "aoauth_access_tokens"[0m
+  [1m[35m (0.1ms)[0m  [1m[35mDROP TABLE "aoauth_access_tokens"[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA defer_foreign_keys = 0[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA foreign_keys = 1[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.0ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20260607151031') RETURNING "version"[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mcommit transaction[0m
+Migrating to CreateShortUrls (20260608062118)
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mbegin transaction[0m
+  [1m[35m (0.4ms)[0m  [1m[35mCREATE TABLE "short_urls" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "url" varchar, "code" varchar, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL)[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.0ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20260608062118') RETURNING "version"[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mcommit transaction[0m
+Migrating to CreateClicks (20260608062401)
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mbegin transaction[0m
+  [1m[35m (0.6ms)[0m  [1m[35mCREATE TABLE "clicks" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "count" integer, "short_url_id" integer, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, CONSTRAINT "fk_rails_5f855707a7"
+FOREIGN KEY ("short_url_id")
+  REFERENCES "short_urls" ("id")
+)[0m
+  [1m[35m (0.0ms)[0m  [1m[35mCREATE INDEX "index_clicks_on_short_url_id" ON "clicks" ("short_url_id")[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.0ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20260608062401') RETURNING "version"[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.0ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[36mUser Load (0.3ms)[0m  [1m[34mSELECT "users".* FROM "users" /* loading for pp */ LIMIT ?[0m  [["LIMIT", 11]]
+Started POST "/auth/signup" for 127.0.0.1 at 2026-06-08 13:15:44 +0530
+  [1m[36mActiveRecord::SchemaMigration Load (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Processing by AuthController#signup as */*
+Completed 500 Internal Server Error in 9ms (Views: 0.4ms | ActiveRecord: 0.0ms | Allocations: 3605)
+
+
+Started POST "/auth/signup" for 127.0.0.1 at 2026-06-08 13:16:39 +0530
+Processing by AuthController#signup as */*
+  Parameters: {"user"=>{"email"=>"gopika123@yopmail.com", "password"=>"[FILTERED]"}, "auth"=>{"user"=>{"email"=>"gopika123@yopmail.com", "password"=>"[FILTERED]"}}}
+  [1m[36mUser Load (0.3ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."email" = ? LIMIT ?[0m  [["email", "gopika123@yopmail.com"], ["LIMIT", 1]]
+  ↳ app/controllers/auth_controller.rb:4:in `signup'
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mbegin transaction[0m
+  ↳ app/controllers/auth_controller.rb:8:in `block in signup'
+  [1m[36mUser Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "users" WHERE "users"."email" = ? LIMIT ?[0m  [["email", "gopika123@yopmail.com"], ["LIMIT", 1]]
+  ↳ app/controllers/auth_controller.rb:8:in `block in signup'
+  [1m[36mUser Create (0.8ms)[0m  [1m[32mINSERT INTO "users" ("email", "encrypted_password", "reset_password_token", "reset_password_sent_at", "remember_created_at", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["email", "gopika123@yopmail.com"], ["encrypted_password", "[FILTERED]"], ["reset_password_token", "[FILTERED]"], ["reset_password_sent_at", "[FILTERED]"], ["remember_created_at", nil], ["created_at", "2026-06-08 07:46:39.852357"], ["updated_at", "2026-06-08 07:46:39.852357"]]
+  ↳ app/controllers/auth_controller.rb:8:in `block in signup'
+  [1m[36mDoorkeeper::AccessToken Exists? (0.0ms)[0m  [1m[34mSELECT 1 AS one FROM "oauth_access_tokens" WHERE "oauth_access_tokens"."token" = ? LIMIT ?[0m  [["token", "[FILTERED]"], ["LIMIT", 1]]
+  ↳ app/controllers/auth_controller.rb:35:in `generate_access_token'
+  [1m[36mDoorkeeper::AccessToken Exists? (0.2ms)[0m  [1m[34mSELECT 1 AS one FROM "oauth_access_tokens" WHERE "oauth_access_tokens"."refresh_token" = ? LIMIT ?[0m  [["refresh_token", "[FILTERED]"], ["LIMIT", 1]]
+  ↳ app/controllers/auth_controller.rb:35:in `generate_access_token'
+  [1m[36mDoorkeeper::AccessToken Create (0.1ms)[0m  [1m[32mINSERT INTO "oauth_access_tokens" ("resource_owner_id", "token", "refresh_token", "expires_in", "scopes", "created_at", "revoked_at", "previous_refresh_token") VALUES (?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["resource_owner_id", 1], ["token", "[FILTERED]"], ["refresh_token", "[FILTERED]"], ["expires_in", 7200], ["scopes", "user"], ["created_at", "2026-06-08 07:46:39.877957"], ["revoked_at", nil], ["previous_refresh_token", "[FILTERED]"]]
+  ↳ app/controllers/auth_controller.rb:35:in `generate_access_token'
+  [1m[36mTRANSACTION (0.3ms)[0m  [1m[36mcommit transaction[0m
+  ↳ app/controllers/auth_controller.rb:7:in `signup'
+Completed 200 OK in 356ms (Views: 0.1ms | ActiveRecord: 4.8ms | Allocations: 34643)
+
+
+  [1m[36mActiveRecord::InternalMetadata Load (0.4ms)[0m  [1m[34mSELECT * FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = ? ORDER BY "ar_internal_metadata"."key" ASC LIMIT 1[0m  [[nil, "environment"]]
+  [1m[36mActiveRecord::SchemaMigration Load (0.0ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Migrating to AddUsersToShortUrl (20260608080342)
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mbegin transaction[0m
+  [1m[35m (1.2ms)[0m  [1m[35mALTER TABLE "short_urls" ADD "users_id" integer[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE INDEX "index_short_urls_on_users_id" ON "short_urls" ("users_id")[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA foreign_keys[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA defer_foreign_keys[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA defer_foreign_keys = ON[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA foreign_keys = OFF[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE TEMPORARY TABLE "ashort_urls" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "url" varchar DEFAULT NULL, "code" varchar DEFAULT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, "users_id" integer DEFAULT NULL)[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE INDEX "tindex_ashort_urls_on_users_id" ON "ashort_urls" ("users_id")[0m
+  [1m[35m (0.0ms)[0m  [1m[32mINSERT INTO "ashort_urls" ("id","url","code","created_at","updated_at","users_id")
+                     SELECT "id","url","code","created_at","updated_at","users_id" FROM "short_urls"[0m
+  [1m[35m (0.3ms)[0m  [1m[35mDROP TABLE "short_urls"[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE TABLE "short_urls" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "url" varchar DEFAULT NULL, "code" varchar DEFAULT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, "users_id" integer DEFAULT NULL, CONSTRAINT "fk_rails_e0680ad8e7"
+FOREIGN KEY ("users_id")
+  REFERENCES "users" ("id")
+)[0m
+  [1m[35m (0.0ms)[0m  [1m[35mCREATE INDEX "index_short_urls_on_users_id" ON "short_urls" ("users_id")[0m
+  [1m[35m (0.0ms)[0m  [1m[32mINSERT INTO "short_urls" ("id","url","code","created_at","updated_at","users_id")
+                     SELECT "id","url","code","created_at","updated_at","users_id" FROM "ashort_urls"[0m
+  [1m[35m (0.0ms)[0m  [1m[35mDROP TABLE "ashort_urls"[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA defer_foreign_keys = 0[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA foreign_keys = 1[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.0ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20260608080342') RETURNING "version"[0m
+  [1m[36mTRANSACTION (0.3ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.0ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Started POST "/auth/signup" for 127.0.0.1 at 2026-06-08 13:42:02 +0530
+  [1m[36mActiveRecord::SchemaMigration Load (0.2ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Processing by AuthController#signup as */*
+  Parameters: {"user"=>{"email"=>"gopika123@yopmail.com", "password"=>"[FILTERED]"}, "auth"=>{"user"=>{"email"=>"gopika123@yopmail.com", "password"=>"[FILTERED]"}}}
+  [1m[36mUser Load (0.3ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."email" = ? LIMIT ?[0m  [["email", "gopika123@yopmail.com"], ["LIMIT", 1]]
+  ↳ app/controllers/auth_controller.rb:4:in `signup'
+Completed 422 Unprocessable Content in 14ms (Views: 0.2ms | ActiveRecord: 1.2ms | Allocations: 11686)
+
+
+Started POST "/auth/login" for 127.0.0.1 at 2026-06-08 13:42:16 +0530
+Processing by AuthController#login as */*
+  Parameters: {"user"=>{"email"=>"gopika123@yopmail.com", "password"=>"[FILTERED]"}, "auth"=>{"user"=>{"email"=>"gopika123@yopmail.com", "password"=>"[FILTERED]"}}}
+  [1m[36mUser Load (3.0ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."email" = ? LIMIT ?[0m  [["email", "gopika123@yopmail.com"], ["LIMIT", 1]]
+  ↳ app/controllers/auth_controller.rb:16:in `login'
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  ↳ app/controllers/auth_controller.rb:35:in `generate_access_token'
+  [1m[36mDoorkeeper::AccessToken Exists? (0.2ms)[0m  [1m[34mSELECT 1 AS one FROM "oauth_access_tokens" WHERE "oauth_access_tokens"."token" = ? LIMIT ?[0m  [["token", "[FILTERED]"], ["LIMIT", 1]]
+  ↳ app/controllers/auth_controller.rb:35:in `generate_access_token'
+  [1m[36mDoorkeeper::AccessToken Exists? (0.3ms)[0m  [1m[34mSELECT 1 AS one FROM "oauth_access_tokens" WHERE "oauth_access_tokens"."refresh_token" = ? LIMIT ?[0m  [["refresh_token", "[FILTERED]"], ["LIMIT", 1]]
+  ↳ app/controllers/auth_controller.rb:35:in `generate_access_token'
+  [1m[36mDoorkeeper::AccessToken Create (0.4ms)[0m  [1m[32mINSERT INTO "oauth_access_tokens" ("resource_owner_id", "token", "refresh_token", "expires_in", "scopes", "created_at", "revoked_at", "previous_refresh_token") VALUES (?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["resource_owner_id", 1], ["token", "[FILTERED]"], ["refresh_token", "[FILTERED]"], ["expires_in", 7200], ["scopes", "user"], ["created_at", "2026-06-08 08:12:16.390316"], ["revoked_at", nil], ["previous_refresh_token", "[FILTERED]"]]
+  ↳ app/controllers/auth_controller.rb:35:in `generate_access_token'
+  [1m[36mTRANSACTION (0.3ms)[0m  [1m[36mcommit transaction[0m
+  ↳ app/controllers/auth_controller.rb:35:in `generate_access_token'
+Completed 200 OK in 318ms (Views: 0.2ms | ActiveRecord: 5.7ms | Allocations: 17494)
+
+
+Started POST "/short_code" for 127.0.0.1 at 2026-06-08 13:42:29 +0530
+  
+ActionController::RoutingError (No route matches [POST] "/short_code"):
+  
+Started POST "/url/short_code" for 127.0.0.1 at 2026-06-08 13:42:39 +0530
+  
+ActionController::RoutingError (No route matches [POST] "/url/short_code"):
+  
+Started POST "/url/shorten" for 127.0.0.1 at 2026-06-08 13:43:30 +0530
+Processing by UrlController#short_code as */*
+  Parameters: {"url"=>"https://docs.google.com/spreadsheets/d/1_gD3vhda6Q-kd4wfRRDzYYsV2kUlwZWkpYetU7Nfi2M/edit?gid=1973289235#gid=1973289235"}
+Filter chain halted as :doorkeeper_authorize! rendered or redirected
+Completed 401 Unauthorized in 29ms (ActiveRecord: 0.0ms | Allocations: 7035)
+
+
+Started POST "/auth/login" for 127.0.0.1 at 2026-06-08 13:44:38 +0530
+Processing by AuthController#login as */*
+  Parameters: {"user"=>{"email"=>"gopika23@yopmail.com", "password"=>"[FILTERED]"}, "auth"=>{"user"=>{"email"=>"gopika23@yopmail.com", "password"=>"[FILTERED]"}}}
+  [1m[36mUser Load (4.4ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."email" = ? LIMIT ?[0m  [["email", "gopika23@yopmail.com"], ["LIMIT", 1]]
+  ↳ app/controllers/auth_controller.rb:16:in `login'
+Completed 422 Unprocessable Content in 7ms (Views: 0.3ms | ActiveRecord: 4.3ms | Allocations: 463)
+
+
+  [1m[36mUser Load (1.7ms)[0m  [1m[34mSELECT "users".* FROM "users" /* loading for pp */ LIMIT ?[0m  [["LIMIT", 11]]
+Started POST "/auth/login" for 127.0.0.1 at 2026-06-08 13:45:14 +0530
+Processing by AuthController#login as */*
+  Parameters: {"user"=>{"email"=>"gopika123@yopmail.com", "password"=>"[FILTERED]"}, "auth"=>{"user"=>{"email"=>"gopika123@yopmail.com", "password"=>"[FILTERED]"}}}
+  [1m[36mUser Load (0.2ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."email" = ? LIMIT ?[0m  [["email", "gopika123@yopmail.com"], ["LIMIT", 1]]
+  ↳ app/controllers/auth_controller.rb:16:in `login'
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  ↳ app/controllers/auth_controller.rb:35:in `generate_access_token'
+  [1m[36mDoorkeeper::AccessToken Exists? (0.7ms)[0m  [1m[34mSELECT 1 AS one FROM "oauth_access_tokens" WHERE "oauth_access_tokens"."token" = ? LIMIT ?[0m  [["token", "[FILTERED]"], ["LIMIT", 1]]
+  ↳ app/controllers/auth_controller.rb:35:in `generate_access_token'
+  [1m[36mDoorkeeper::AccessToken Exists? (0.0ms)[0m  [1m[34mSELECT 1 AS one FROM "oauth_access_tokens" WHERE "oauth_access_tokens"."refresh_token" = ? LIMIT ?[0m  [["refresh_token", "[FILTERED]"], ["LIMIT", 1]]
+  ↳ app/controllers/auth_controller.rb:35:in `generate_access_token'
+  [1m[36mDoorkeeper::AccessToken Create (0.8ms)[0m  [1m[32mINSERT INTO "oauth_access_tokens" ("resource_owner_id", "token", "refresh_token", "expires_in", "scopes", "created_at", "revoked_at", "previous_refresh_token") VALUES (?, ?, ?, ?, ?, ?, ?, ?) RETURNING "id"[0m  [["resource_owner_id", 1], ["token", "[FILTERED]"], ["refresh_token", "[FILTERED]"], ["expires_in", 7200], ["scopes", "user"], ["created_at", "2026-06-08 08:15:15.063118"], ["revoked_at", nil], ["previous_refresh_token", "[FILTERED]"]]
+  ↳ app/controllers/auth_controller.rb:35:in `generate_access_token'
+  [1m[36mTRANSACTION (0.4ms)[0m  [1m[36mcommit transaction[0m
+  ↳ app/controllers/auth_controller.rb:35:in `generate_access_token'
+Completed 200 OK in 297ms (Views: 0.2ms | ActiveRecord: 2.2ms | Allocations: 3440)
+
+
+Started POST "/url/shorten" for 127.0.0.1 at 2026-06-08 13:45:23 +0530
+Processing by UrlController#short_code as */*
+  Parameters: {"url"=>"https://docs.google.com/spreadsheets/d/1_gD3vhda6Q-kd4wfRRDzYYsV2kUlwZWkpYetU7Nfi2M/edit?gid=1973289235#gid=1973289235"}
+  [1m[36mDoorkeeper::AccessToken Load (0.2ms)[0m  [1m[34mSELECT "oauth_access_tokens".* FROM "oauth_access_tokens" WHERE "oauth_access_tokens"."token" = ? LIMIT ?[0m  [["token", "[FILTERED]"], ["LIMIT", 1]]
+Completed 500 Internal Server Error in 7ms (ActiveRecord: 0.2ms | Allocations: 1470)
+
+
+  
+NoMethodError (undefined method `short_urls' for nil):
+  
+app/controllers/url_controller.rb:5:in `short_code'
+Started POST "/url/shorten" for 127.0.0.1 at 2026-06-08 13:50:38 +0530
+Processing by UrlController#short_code as */*
+  Parameters: {"url"=>"https://docs.google.com/spreadsheets/d/1_gD3vhda6Q-kd4wfRRDzYYsV2kUlwZWkpYetU7Nfi2M/edit?gid=1973289235#gid=1973289235"}
+  [1m[36mDoorkeeper::AccessToken Load (0.2ms)[0m  [1m[34mSELECT "oauth_access_tokens".* FROM "oauth_access_tokens" WHERE "oauth_access_tokens"."token" = ? LIMIT ?[0m  [["token", "[FILTERED]"], ["LIMIT", 1]]
+  [1m[36mUser Load (0.1ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = ? LIMIT ?[0m  [["id", 1], ["LIMIT", 1]]
+  ↳ app/controllers/url_controller.rb:33:in `set_user'
+Completed 500 Internal Server Error in 25ms (ActiveRecord: 3.6ms | Allocations: 15145)
+
+
+  
+ActiveModel::UnknownAttributeError (unknown attribute 'user_id' for ShortUrl.):
+  
+app/controllers/url_controller.rb:6:in `short_code'
+  [1m[36mActiveRecord::SchemaMigration Load (0.0ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.0ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.0ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.0ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Migrating to AddUsersToShortUrl (20260608080342)
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA foreign_keys[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA defer_foreign_keys[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA defer_foreign_keys = ON[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA foreign_keys = OFF[0m
+  [1m[35m (0.7ms)[0m  [1m[35mCREATE TEMPORARY TABLE "ashort_urls" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "url" varchar DEFAULT NULL, "code" varchar DEFAULT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, "users_id" integer DEFAULT NULL)[0m
+  [1m[35m (0.0ms)[0m  [1m[35mCREATE INDEX "tindex_ashort_urls_on_users_id" ON "ashort_urls" ("users_id")[0m
+  [1m[35m (0.0ms)[0m  [1m[32mINSERT INTO "ashort_urls" ("id","url","code","created_at","updated_at","users_id")
+                     SELECT "id","url","code","created_at","updated_at","users_id" FROM "short_urls"[0m
+  [1m[35m (0.3ms)[0m  [1m[35mDROP TABLE "short_urls"[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE TABLE "short_urls" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "url" varchar DEFAULT NULL, "code" varchar DEFAULT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, "users_id" integer DEFAULT NULL)[0m
+  [1m[35m (0.0ms)[0m  [1m[35mCREATE INDEX "index_short_urls_on_users_id" ON "short_urls" ("users_id")[0m
+  [1m[35m (0.0ms)[0m  [1m[32mINSERT INTO "short_urls" ("id","url","code","created_at","updated_at","users_id")
+                     SELECT "id","url","code","created_at","updated_at","users_id" FROM "ashort_urls"[0m
+  [1m[35m (0.1ms)[0m  [1m[35mDROP TABLE "ashort_urls"[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA defer_foreign_keys = 0[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA foreign_keys = 1[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA foreign_keys[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA defer_foreign_keys[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA defer_foreign_keys = ON[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA foreign_keys = OFF[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE TEMPORARY TABLE "ashort_urls" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "url" varchar DEFAULT NULL, "code" varchar DEFAULT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, "users_id" integer DEFAULT NULL)[0m
+  [1m[35m (0.0ms)[0m  [1m[35mCREATE INDEX "tindex_ashort_urls_on_users_id" ON "ashort_urls" ("users_id")[0m
+  [1m[35m (0.0ms)[0m  [1m[32mINSERT INTO "ashort_urls" ("id","url","code","created_at","updated_at","users_id")
+                     SELECT "id","url","code","created_at","updated_at","users_id" FROM "short_urls"[0m
+  [1m[35m (0.1ms)[0m  [1m[35mDROP TABLE "short_urls"[0m
+  [1m[35m (0.0ms)[0m  [1m[35mCREATE TABLE "short_urls" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "url" varchar DEFAULT NULL, "code" varchar DEFAULT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL)[0m
+  [1m[35m (0.0ms)[0m  [1m[32mINSERT INTO "short_urls" ("id","url","code","created_at","updated_at")
+                     SELECT "id","url","code","created_at","updated_at" FROM "ashort_urls"[0m
+  [1m[35m (0.0ms)[0m  [1m[35mDROP TABLE "ashort_urls"[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA defer_foreign_keys = 0[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA foreign_keys = 1[0m
+  [1m[36mActiveRecord::SchemaMigration Destroy (0.0ms)[0m  [1m[31mDELETE FROM "schema_migrations" WHERE "schema_migrations"."version" = '20260608080342'[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.0ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[36mActiveRecord::InternalMetadata Load (0.2ms)[0m  [1m[34mSELECT * FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = ? ORDER BY "ar_internal_metadata"."key" ASC LIMIT 1[0m  [[nil, "environment"]]
+  [1m[36mActiveRecord::SchemaMigration Load (0.0ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Migrating to AddUsersToShortUrl (20260608080342)
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mbegin transaction[0m
+  [1m[35m (0.7ms)[0m  [1m[35mALTER TABLE "short_urls" ADD "user_id" integer[0m
+  [1m[35m (0.2ms)[0m  [1m[35mCREATE INDEX "index_short_urls_on_user_id" ON "short_urls" ("user_id")[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA foreign_keys[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA defer_foreign_keys[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA defer_foreign_keys = ON[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA foreign_keys = OFF[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE TEMPORARY TABLE "ashort_urls" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "url" varchar DEFAULT NULL, "code" varchar DEFAULT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, "user_id" integer DEFAULT NULL)[0m
+  [1m[35m (0.0ms)[0m  [1m[35mCREATE INDEX "tindex_ashort_urls_on_user_id" ON "ashort_urls" ("user_id")[0m
+  [1m[35m (0.0ms)[0m  [1m[32mINSERT INTO "ashort_urls" ("id","url","code","created_at","updated_at","user_id")
+                     SELECT "id","url","code","created_at","updated_at","user_id" FROM "short_urls"[0m
+  [1m[35m (0.1ms)[0m  [1m[35mDROP TABLE "short_urls"[0m
+  [1m[35m (0.0ms)[0m  [1m[35mCREATE TABLE "short_urls" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "url" varchar DEFAULT NULL, "code" varchar DEFAULT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, "user_id" integer DEFAULT NULL, CONSTRAINT "fk_rails_3cf0644dda"
+FOREIGN KEY ("user_id")
+  REFERENCES "users" ("id")
+)[0m
+  [1m[35m (0.0ms)[0m  [1m[35mCREATE INDEX "index_short_urls_on_user_id" ON "short_urls" ("user_id")[0m
+  [1m[35m (0.0ms)[0m  [1m[32mINSERT INTO "short_urls" ("id","url","code","created_at","updated_at","user_id")
+                     SELECT "id","url","code","created_at","updated_at","user_id" FROM "ashort_urls"[0m
+  [1m[35m (0.1ms)[0m  [1m[35mDROP TABLE "ashort_urls"[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA defer_foreign_keys = 0[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA foreign_keys = 1[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.1ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20260608080342') RETURNING "version"[0m
+  [1m[36mTRANSACTION (1.9ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.0ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Started POST "/url/shorten" for 127.0.0.1 at 2026-06-08 13:53:55 +0530
+  [1m[36mActiveRecord::SchemaMigration Load (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Processing by UrlController#short_code as */*
+  Parameters: {"url"=>"https://docs.google.com/spreadsheets/d/1_gD3vhda6Q-kd4wfRRDzYYsV2kUlwZWkpYetU7Nfi2M/edit?gid=1973289235#gid=1973289235"}
+  [1m[36mDoorkeeper::AccessToken Load (0.2ms)[0m  [1m[34mSELECT "oauth_access_tokens".* FROM "oauth_access_tokens" WHERE "oauth_access_tokens"."token" = ? LIMIT ?[0m  [["token", "[FILTERED]"], ["LIMIT", 1]]
+  [1m[36mUser Load (0.2ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = ? LIMIT ?[0m  [["id", 1], ["LIMIT", 1]]
+  ↳ app/controllers/url_controller.rb:33:in `set_user'
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mbegin transaction[0m
+  ↳ app/models/short_url.rb:16:in `block in generate_short_code'
+  [1m[36mShortUrl Exists? (0.5ms)[0m  [1m[34mSELECT 1 AS one FROM "short_urls" WHERE "short_urls"."code" = ? LIMIT ?[0m  [["code", "[FILTERED]"], ["LIMIT", 1]]
+  ↳ app/models/short_url.rb:16:in `block in generate_short_code'
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[31mrollback transaction[0m
+  ↳ app/controllers/url_controller.rb:6:in `short_code'
+Completed 500 Internal Server Error in 40ms (ActiveRecord: 2.4ms | Allocations: 31407)
+
+
+  
+NameError (Missing model class Users for the ShortUrl#users association. You can specify a different model class with the :class_name option.):
+  
+app/controllers/url_controller.rb:6:in `short_code'
+  [1m[36mActiveRecord::SchemaMigration Load (0.0ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.0ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.0ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.0ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Migrating to AddUsersToShortUrl (20260608080342)
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA foreign_keys[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA defer_foreign_keys[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA defer_foreign_keys = ON[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA foreign_keys = OFF[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE TEMPORARY TABLE "ashort_urls" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "url" varchar DEFAULT NULL, "code" varchar DEFAULT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, "user_id" integer DEFAULT NULL)[0m
+  [1m[35m (0.0ms)[0m  [1m[35mCREATE INDEX "tindex_ashort_urls_on_user_id" ON "ashort_urls" ("user_id")[0m
+  [1m[35m (0.0ms)[0m  [1m[32mINSERT INTO "ashort_urls" ("id","url","code","created_at","updated_at","user_id")
+                     SELECT "id","url","code","created_at","updated_at","user_id" FROM "short_urls"[0m
+  [1m[35m (0.2ms)[0m  [1m[35mDROP TABLE "short_urls"[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE TABLE "short_urls" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "url" varchar DEFAULT NULL, "code" varchar DEFAULT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, "user_id" integer DEFAULT NULL)[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE INDEX "index_short_urls_on_user_id" ON "short_urls" ("user_id")[0m
+  [1m[35m (0.0ms)[0m  [1m[32mINSERT INTO "short_urls" ("id","url","code","created_at","updated_at","user_id")
+                     SELECT "id","url","code","created_at","updated_at","user_id" FROM "ashort_urls"[0m
+  [1m[35m (0.1ms)[0m  [1m[35mDROP TABLE "ashort_urls"[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA defer_foreign_keys = 0[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA foreign_keys = 1[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA foreign_keys[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA defer_foreign_keys[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA defer_foreign_keys = ON[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA foreign_keys = OFF[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE TEMPORARY TABLE "ashort_urls" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "url" varchar DEFAULT NULL, "code" varchar DEFAULT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, "user_id" integer DEFAULT NULL)[0m
+  [1m[35m (0.0ms)[0m  [1m[35mCREATE INDEX "tindex_ashort_urls_on_user_id" ON "ashort_urls" ("user_id")[0m
+  [1m[35m (0.0ms)[0m  [1m[32mINSERT INTO "ashort_urls" ("id","url","code","created_at","updated_at","user_id")
+                     SELECT "id","url","code","created_at","updated_at","user_id" FROM "short_urls"[0m
+  [1m[35m (0.1ms)[0m  [1m[35mDROP TABLE "short_urls"[0m
+  [1m[35m (0.0ms)[0m  [1m[35mCREATE TABLE "short_urls" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "url" varchar DEFAULT NULL, "code" varchar DEFAULT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL)[0m
+  [1m[35m (0.0ms)[0m  [1m[32mINSERT INTO "short_urls" ("id","url","code","created_at","updated_at")
+                     SELECT "id","url","code","created_at","updated_at" FROM "ashort_urls"[0m
+  [1m[35m (0.1ms)[0m  [1m[35mDROP TABLE "ashort_urls"[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA defer_foreign_keys = 0[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA foreign_keys = 1[0m
+  [1m[36mActiveRecord::SchemaMigration Destroy (0.1ms)[0m  [1m[31mDELETE FROM "schema_migrations" WHERE "schema_migrations"."version" = '20260608080342'[0m
+  [1m[36mTRANSACTION (0.8ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.0ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[36mActiveRecord::InternalMetadata Load (0.0ms)[0m  [1m[34mSELECT * FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = ? ORDER BY "ar_internal_metadata"."key" ASC LIMIT 1[0m  [[nil, "environment"]]
+  [1m[36mActiveRecord::SchemaMigration Load (0.0ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Migrating to AddUsersToShortUrl (20260608080342)
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mbegin transaction[0m
+  [1m[35m (0.6ms)[0m  [1m[35mALTER TABLE "short_urls" ADD "users_id" integer[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE INDEX "index_short_urls_on_users_id" ON "short_urls" ("users_id")[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA foreign_keys[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA defer_foreign_keys[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA defer_foreign_keys = ON[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA foreign_keys = OFF[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE TEMPORARY TABLE "ashort_urls" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "url" varchar DEFAULT NULL, "code" varchar DEFAULT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, "users_id" integer DEFAULT NULL)[0m
+  [1m[35m (0.0ms)[0m  [1m[35mCREATE INDEX "tindex_ashort_urls_on_users_id" ON "ashort_urls" ("users_id")[0m
+  [1m[35m (0.0ms)[0m  [1m[32mINSERT INTO "ashort_urls" ("id","url","code","created_at","updated_at","users_id")
+                     SELECT "id","url","code","created_at","updated_at","users_id" FROM "short_urls"[0m
+  [1m[35m (0.1ms)[0m  [1m[35mDROP TABLE "short_urls"[0m
+  [1m[35m (0.0ms)[0m  [1m[35mCREATE TABLE "short_urls" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "url" varchar DEFAULT NULL, "code" varchar DEFAULT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, "users_id" integer DEFAULT NULL, CONSTRAINT "fk_rails_e0680ad8e7"
+FOREIGN KEY ("users_id")
+  REFERENCES "users" ("id")
+)[0m
+  [1m[35m (0.0ms)[0m  [1m[35mCREATE INDEX "index_short_urls_on_users_id" ON "short_urls" ("users_id")[0m
+  [1m[35m (0.0ms)[0m  [1m[32mINSERT INTO "short_urls" ("id","url","code","created_at","updated_at","users_id")
+                     SELECT "id","url","code","created_at","updated_at","users_id" FROM "ashort_urls"[0m
+  [1m[35m (0.0ms)[0m  [1m[35mDROP TABLE "ashort_urls"[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA defer_foreign_keys = 0[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA foreign_keys = 1[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.0ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20260608080342') RETURNING "version"[0m
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.0ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Started POST "/url/shorten" for 127.0.0.1 at 2026-06-08 13:56:28 +0530
+  [1m[36mActiveRecord::SchemaMigration Load (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Processing by UrlController#short_code as */*
+  Parameters: {"url"=>"https://docs.google.com/spreadsheets/d/1_gD3vhda6Q-kd4wfRRDzYYsV2kUlwZWkpYetU7Nfi2M/edit?gid=1973289235#gid=1973289235"}
+  [1m[36mDoorkeeper::AccessToken Load (0.3ms)[0m  [1m[34mSELECT "oauth_access_tokens".* FROM "oauth_access_tokens" WHERE "oauth_access_tokens"."token" = ? LIMIT ?[0m  [["token", "[FILTERED]"], ["LIMIT", 1]]
+  [1m[36mUser Load (0.2ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = ? LIMIT ?[0m  [["id", 1], ["LIMIT", 1]]
+  ↳ app/controllers/url_controller.rb:33:in `set_user'
+Completed 500 Internal Server Error in 31ms (ActiveRecord: 2.0ms | Allocations: 29156)
+
+
+  
+ActiveModel::UnknownAttributeError (unknown attribute 'user_id' for ShortUrl.):
+  
+app/controllers/url_controller.rb:6:in `short_code'
+  [1m[36mActiveRecord::SchemaMigration Load (0.0ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.0ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.0ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.0ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Migrating to AddUsersToShortUrl (20260608080342)
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA foreign_keys[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA defer_foreign_keys[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA defer_foreign_keys = ON[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA foreign_keys = OFF[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE TEMPORARY TABLE "ashort_urls" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "url" varchar DEFAULT NULL, "code" varchar DEFAULT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, "users_id" integer DEFAULT NULL)[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE INDEX "tindex_ashort_urls_on_users_id" ON "ashort_urls" ("users_id")[0m
+  [1m[35m (0.1ms)[0m  [1m[32mINSERT INTO "ashort_urls" ("id","url","code","created_at","updated_at","users_id")
+                     SELECT "id","url","code","created_at","updated_at","users_id" FROM "short_urls"[0m
+  [1m[35m (0.1ms)[0m  [1m[35mDROP TABLE "short_urls"[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE TABLE "short_urls" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "url" varchar DEFAULT NULL, "code" varchar DEFAULT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, "users_id" integer DEFAULT NULL)[0m
+  [1m[35m (0.0ms)[0m  [1m[35mCREATE INDEX "index_short_urls_on_users_id" ON "short_urls" ("users_id")[0m
+  [1m[35m (0.0ms)[0m  [1m[32mINSERT INTO "short_urls" ("id","url","code","created_at","updated_at","users_id")
+                     SELECT "id","url","code","created_at","updated_at","users_id" FROM "ashort_urls"[0m
+  [1m[35m (0.1ms)[0m  [1m[35mDROP TABLE "ashort_urls"[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA defer_foreign_keys = 0[0m
+  [1m[35m (0.1ms)[0m  [1m[35mPRAGMA foreign_keys = 1[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA foreign_keys[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA defer_foreign_keys[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA defer_foreign_keys = ON[0m
+  [1m[35m (0.1ms)[0m  [1m[35mPRAGMA foreign_keys = OFF[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE TEMPORARY TABLE "ashort_urls" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "url" varchar DEFAULT NULL, "code" varchar DEFAULT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, "users_id" integer DEFAULT NULL)[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE INDEX "tindex_ashort_urls_on_users_id" ON "ashort_urls" ("users_id")[0m
+  [1m[35m (0.0ms)[0m  [1m[32mINSERT INTO "ashort_urls" ("id","url","code","created_at","updated_at","users_id")
+                     SELECT "id","url","code","created_at","updated_at","users_id" FROM "short_urls"[0m
+  [1m[35m (0.1ms)[0m  [1m[35mDROP TABLE "short_urls"[0m
+  [1m[35m (0.0ms)[0m  [1m[35mCREATE TABLE "short_urls" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "url" varchar DEFAULT NULL, "code" varchar DEFAULT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL)[0m
+  [1m[35m (0.0ms)[0m  [1m[32mINSERT INTO "short_urls" ("id","url","code","created_at","updated_at")
+                     SELECT "id","url","code","created_at","updated_at" FROM "ashort_urls"[0m
+  [1m[35m (0.0ms)[0m  [1m[35mDROP TABLE "ashort_urls"[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA defer_foreign_keys = 0[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA foreign_keys = 1[0m
+  [1m[36mActiveRecord::SchemaMigration Destroy (0.0ms)[0m  [1m[31mDELETE FROM "schema_migrations" WHERE "schema_migrations"."version" = '20260608080342'[0m
+  [1m[36mTRANSACTION (0.6ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.0ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[36mActiveRecord::InternalMetadata Load (0.1ms)[0m  [1m[34mSELECT * FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = ? ORDER BY "ar_internal_metadata"."key" ASC LIMIT 1[0m  [[nil, "environment"]]
+  [1m[36mActiveRecord::SchemaMigration Load (0.0ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Migrating to AddUsersToShortUrl (20260608080342)
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mbegin transaction[0m
+  [1m[35m (0.5ms)[0m  [1m[35mALTER TABLE "short_urls" ADD "users_id" integer[0m
+  [1m[35m (0.7ms)[0m  [1m[35mCREATE INDEX "index_short_urls_on_users_id" ON "short_urls" ("users_id")[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA foreign_keys[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA defer_foreign_keys[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA defer_foreign_keys = ON[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA foreign_keys = OFF[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE TEMPORARY TABLE "ashort_urls" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "url" varchar DEFAULT NULL, "code" varchar DEFAULT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, "users_id" integer DEFAULT NULL)[0m
+  [1m[35m (0.0ms)[0m  [1m[35mCREATE INDEX "tindex_ashort_urls_on_users_id" ON "ashort_urls" ("users_id")[0m
+  [1m[35m (0.1ms)[0m  [1m[32mINSERT INTO "ashort_urls" ("id","url","code","created_at","updated_at","users_id")
+                     SELECT "id","url","code","created_at","updated_at","users_id" FROM "short_urls"[0m
+  [1m[35m (0.1ms)[0m  [1m[35mDROP TABLE "short_urls"[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE TABLE "short_urls" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "url" varchar DEFAULT NULL, "code" varchar DEFAULT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, "users_id" integer DEFAULT NULL, CONSTRAINT "fk_rails_e0680ad8e7"
+FOREIGN KEY ("users_id")
+  REFERENCES "users" ("id")
+)[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE INDEX "index_short_urls_on_users_id" ON "short_urls" ("users_id")[0m
+  [1m[35m (0.0ms)[0m  [1m[32mINSERT INTO "short_urls" ("id","url","code","created_at","updated_at","users_id")
+                     SELECT "id","url","code","created_at","updated_at","users_id" FROM "ashort_urls"[0m
+  [1m[35m (0.1ms)[0m  [1m[35mDROP TABLE "ashort_urls"[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA defer_foreign_keys = 0[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA foreign_keys = 1[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.0ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20260608080342') RETURNING "version"[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.0ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.0ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.0ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.0ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.0ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Migrating to AddUsersToShortUrl (20260608080342)
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mbegin transaction[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA foreign_keys[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA defer_foreign_keys[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA defer_foreign_keys = ON[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA foreign_keys = OFF[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE TEMPORARY TABLE "ashort_urls" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "url" varchar DEFAULT NULL, "code" varchar DEFAULT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, "users_id" integer DEFAULT NULL)[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE INDEX "tindex_ashort_urls_on_users_id" ON "ashort_urls" ("users_id")[0m
+  [1m[35m (0.0ms)[0m  [1m[32mINSERT INTO "ashort_urls" ("id","url","code","created_at","updated_at","users_id")
+                     SELECT "id","url","code","created_at","updated_at","users_id" FROM "short_urls"[0m
+  [1m[35m (0.1ms)[0m  [1m[35mDROP TABLE "short_urls"[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE TABLE "short_urls" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "url" varchar DEFAULT NULL, "code" varchar DEFAULT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, "users_id" integer DEFAULT NULL)[0m
+  [1m[35m (0.0ms)[0m  [1m[35mCREATE INDEX "index_short_urls_on_users_id" ON "short_urls" ("users_id")[0m
+  [1m[35m (0.0ms)[0m  [1m[32mINSERT INTO "short_urls" ("id","url","code","created_at","updated_at","users_id")
+                     SELECT "id","url","code","created_at","updated_at","users_id" FROM "ashort_urls"[0m
+  [1m[35m (0.0ms)[0m  [1m[35mDROP TABLE "ashort_urls"[0m
+  [1m[35m (0.1ms)[0m  [1m[35mPRAGMA defer_foreign_keys = 0[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA foreign_keys = 1[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA foreign_keys[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA defer_foreign_keys[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA defer_foreign_keys = ON[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA foreign_keys = OFF[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE TEMPORARY TABLE "ashort_urls" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "url" varchar DEFAULT NULL, "code" varchar DEFAULT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, "users_id" integer DEFAULT NULL)[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE INDEX "tindex_ashort_urls_on_users_id" ON "ashort_urls" ("users_id")[0m
+  [1m[35m (0.0ms)[0m  [1m[32mINSERT INTO "ashort_urls" ("id","url","code","created_at","updated_at","users_id")
+                     SELECT "id","url","code","created_at","updated_at","users_id" FROM "short_urls"[0m
+  [1m[35m (0.1ms)[0m  [1m[35mDROP TABLE "short_urls"[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE TABLE "short_urls" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "url" varchar DEFAULT NULL, "code" varchar DEFAULT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL)[0m
+  [1m[35m (0.0ms)[0m  [1m[32mINSERT INTO "short_urls" ("id","url","code","created_at","updated_at")
+                     SELECT "id","url","code","created_at","updated_at" FROM "ashort_urls"[0m
+  [1m[35m (0.1ms)[0m  [1m[35mDROP TABLE "ashort_urls"[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA defer_foreign_keys = 0[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA foreign_keys = 1[0m
+  [1m[36mActiveRecord::SchemaMigration Destroy (0.0ms)[0m  [1m[31mDELETE FROM "schema_migrations" WHERE "schema_migrations"."version" = '20260608080342'[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.0ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[36mActiveRecord::InternalMetadata Load (0.1ms)[0m  [1m[34mSELECT * FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = ? ORDER BY "ar_internal_metadata"."key" ASC LIMIT 1[0m  [[nil, "environment"]]
+  [1m[36mActiveRecord::SchemaMigration Load (0.0ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Migrating to AddUsersToShortUrl (20260608080342)
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mbegin transaction[0m
+  [1m[35m (1.2ms)[0m  [1m[35mALTER TABLE "short_urls" ADD "user_id" integer[0m
+  [1m[35m (0.3ms)[0m  [1m[35mCREATE INDEX "index_short_urls_on_user_id" ON "short_urls" ("user_id")[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA foreign_keys[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA defer_foreign_keys[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA defer_foreign_keys = ON[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA foreign_keys = OFF[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE TEMPORARY TABLE "ashort_urls" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "url" varchar DEFAULT NULL, "code" varchar DEFAULT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, "user_id" integer DEFAULT NULL)[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE INDEX "tindex_ashort_urls_on_user_id" ON "ashort_urls" ("user_id")[0m
+  [1m[35m (0.1ms)[0m  [1m[32mINSERT INTO "ashort_urls" ("id","url","code","created_at","updated_at","user_id")
+                     SELECT "id","url","code","created_at","updated_at","user_id" FROM "short_urls"[0m
+  [1m[35m (0.1ms)[0m  [1m[35mDROP TABLE "short_urls"[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE TABLE "short_urls" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "url" varchar DEFAULT NULL, "code" varchar DEFAULT NULL, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL, "user_id" integer DEFAULT NULL, CONSTRAINT "fk_rails_3cf0644dda"
+FOREIGN KEY ("user_id")
+  REFERENCES "users" ("id")
+)[0m
+  [1m[35m (0.1ms)[0m  [1m[35mCREATE INDEX "index_short_urls_on_user_id" ON "short_urls" ("user_id")[0m
+  [1m[35m (0.0ms)[0m  [1m[32mINSERT INTO "short_urls" ("id","url","code","created_at","updated_at","user_id")
+                     SELECT "id","url","code","created_at","updated_at","user_id" FROM "ashort_urls"[0m
+  [1m[35m (0.1ms)[0m  [1m[35mDROP TABLE "ashort_urls"[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA defer_foreign_keys = 0[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA foreign_keys = 1[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.1ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20260608080342') RETURNING "version"[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mcommit transaction[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.0ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Started POST "/url/shorten" for 127.0.0.1 at 2026-06-08 13:59:42 +0530
+  [1m[36mActiveRecord::SchemaMigration Load (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Processing by UrlController#short_code as */*
+  Parameters: {"url"=>"https://docs.google.com/spreadsheets/d/1_gD3vhda6Q-kd4wfRRDzYYsV2kUlwZWkpYetU7Nfi2M/edit?gid=1973289235#gid=1973289235"}
+  [1m[36mDoorkeeper::AccessToken Load (0.1ms)[0m  [1m[34mSELECT "oauth_access_tokens".* FROM "oauth_access_tokens" WHERE "oauth_access_tokens"."token" = ? LIMIT ?[0m  [["token", "[FILTERED]"], ["LIMIT", 1]]
+  [1m[36mUser Load (0.3ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = ? LIMIT ?[0m  [["id", 1], ["LIMIT", 1]]
+  ↳ app/controllers/url_controller.rb:33:in `set_user'
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mbegin transaction[0m
+  ↳ app/models/short_url.rb:16:in `block in generate_short_code'
+  [1m[36mShortUrl Exists? (0.3ms)[0m  [1m[34mSELECT 1 AS one FROM "short_urls" WHERE "short_urls"."code" = ? LIMIT ?[0m  [["code", "[FILTERED]"], ["LIMIT", 1]]
+  ↳ app/models/short_url.rb:16:in `block in generate_short_code'
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[31mrollback transaction[0m
+  ↳ app/controllers/url_controller.rb:6:in `short_code'
+Completed 500 Internal Server Error in 38ms (ActiveRecord: 2.3ms | Allocations: 31407)
+
+
+  
+NameError (Missing model class Users for the ShortUrl#users association. You can specify a different model class with the :class_name option.):
+  
+app/controllers/url_controller.rb:6:in `short_code'
+Started POST "/url/shorten" for 127.0.0.1 at 2026-06-08 14:00:45 +0530
+  [1m[36mActiveRecord::SchemaMigration Load (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Processing by UrlController#short_code as */*
+  Parameters: {"url"=>"https://docs.google.com/spreadsheets/d/1_gD3vhda6Q-kd4wfRRDzYYsV2kUlwZWkpYetU7Nfi2M/edit?gid=1973289235#gid=1973289235"}
+  [1m[36mDoorkeeper::AccessToken Load (0.1ms)[0m  [1m[34mSELECT "oauth_access_tokens".* FROM "oauth_access_tokens" WHERE "oauth_access_tokens"."token" = ? LIMIT ?[0m  [["token", "[FILTERED]"], ["LIMIT", 1]]
+  [1m[36mUser Load (0.0ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = ? LIMIT ?[0m  [["id", 1], ["LIMIT", 1]]
+  ↳ app/controllers/url_controller.rb:33:in `set_user'
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mbegin transaction[0m
+  ↳ app/models/short_url.rb:16:in `block in generate_short_code'
+  [1m[36mShortUrl Exists? (0.4ms)[0m  [1m[34mSELECT 1 AS one FROM "short_urls" WHERE "short_urls"."code" = ? LIMIT ?[0m  [["code", "[FILTERED]"], ["LIMIT", 1]]
+  ↳ app/models/short_url.rb:16:in `block in generate_short_code'
+  [1m[36mCACHE ShortUrl Exists? (0.0ms)[0m  [1m[34mSELECT 1 AS one FROM "short_urls" WHERE "short_urls"."code" = ? LIMIT ?[0m  [["code", "[FILTERED]"], ["LIMIT", 1]]
+  ↳ app/controllers/url_controller.rb:6:in `short_code'
+  [1m[36mShortUrl Exists? (0.0ms)[0m  [1m[34mSELECT 1 AS one FROM "short_urls" WHERE "short_urls"."url" = ? LIMIT ?[0m  [["url", "https://docs.google.com/spreadsheets/d/1_gD3vhda6Q-kd4wfRRDzYYsV2kUlwZWkpYetU7Nfi2M/edit?gid=1973289235#gid=1973289235"], ["LIMIT", 1]]
+  ↳ app/controllers/url_controller.rb:6:in `short_code'
+  [1m[36mShortUrl Create (0.1ms)[0m  [1m[32mINSERT INTO "short_urls" ("url", "code", "created_at", "updated_at", "user_id") VALUES (?, ?, ?, ?, ?) RETURNING "id"[0m  [["url", "https://docs.google.com/spreadsheets/d/1_gD3vhda6Q-kd4wfRRDzYYsV2kUlwZWkpYetU7Nfi2M/edit?gid=1973289235#gid=1973289235"], ["code", "[FILTERED]"], ["created_at", "2026-06-08 08:30:45.990790"], ["updated_at", "2026-06-08 08:30:45.990790"], ["user_id", 1]]
+  ↳ app/controllers/url_controller.rb:6:in `short_code'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[36mcommit transaction[0m
+  ↳ app/controllers/url_controller.rb:6:in `short_code'
+Completed 200 OK in 37ms (Views: 0.1ms | ActiveRecord: 2.7ms | Allocations: 33797)
+
+
+Started GET "/url/Z83LL1sv" for ::1 at 2026-06-08 14:01:11 +0530
+Processing by UrlController#redirect as HTML
+  Parameters: {"code"=>"[FILTERED]"}
+  [1m[36mShortUrl Load (1.7ms)[0m  [1m[34mSELECT "short_urls".* FROM "short_urls" WHERE "short_urls"."code" = ? LIMIT ?[0m  [["code", "[FILTERED]"], ["LIMIT", 1]]
+  ↳ app/controllers/url_controller.rb:17:in `redirect'
+  [1m[36mClick Load (0.2ms)[0m  [1m[34mSELECT "clicks".* FROM "clicks" WHERE "clicks"."short_url_id" = ? LIMIT ?[0m  [["short_url_id", 1], ["LIMIT", 1]]
+  ↳ app/controllers/url_controller.rb:20:in `redirect'
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mbegin transaction[0m
+  ↳ app/controllers/url_controller.rb:20:in `redirect'
+  [1m[36mClick Exists? (1.8ms)[0m  [1m[34mSELECT 1 AS one FROM "clicks" WHERE "clicks"."short_url_id" = ? LIMIT ?[0m  [["short_url_id", 1], ["LIMIT", 1]]
+  ↳ app/controllers/url_controller.rb:20:in `redirect'
+  [1m[36mClick Create (0.4ms)[0m  [1m[32mINSERT INTO "clicks" ("count", "short_url_id", "created_at", "updated_at") VALUES (?, ?, ?, ?) RETURNING "id"[0m  [["count", nil], ["short_url_id", 1], ["created_at", "2026-06-08 08:31:11.894468"], ["updated_at", "2026-06-08 08:31:11.894468"]]
+  ↳ app/controllers/url_controller.rb:20:in `redirect'
+  [1m[36mTRANSACTION (1.3ms)[0m  [1m[36mcommit transaction[0m
+  ↳ app/controllers/url_controller.rb:20:in `redirect'
+  [1m[36mClick Update All (0.2ms)[0m  [1m[33mUPDATE "clicks" SET "count" = COALESCE("count", 0) + ? WHERE "clicks"."id" = ?[0m  [["count", 1], ["id", 1]]
+  ↳ app/controllers/url_controller.rb:21:in `redirect'
+Redirected to https://docs.google.com/spreadsheets/d/1_gD3vhda6Q-kd4wfRRDzYYsV2kUlwZWkpYetU7Nfi2M/edit?gid=1973289235#gid=1973289235
+Completed 302 Found in 48ms (ActiveRecord: 5.9ms | Allocations: 9768)
+
+
+Started GET "/code" for 127.0.0.1 at 2026-06-08 14:13:58 +0530
+  [1m[36mActiveRecord::SchemaMigration Load (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  
+ActionController::RoutingError (No route matches [GET] "/code"):
+  
+Started GET "/url/code" for 127.0.0.1 at 2026-06-08 14:14:10 +0530
+Processing by UrlController#redirect as */*
+  Parameters: {"code"=>"[FILTERED]"}
+  [1m[36mShortUrl Load (0.4ms)[0m  [1m[34mSELECT "short_urls".* FROM "short_urls" WHERE "short_urls"."code" = ? LIMIT ?[0m  [["code", "[FILTERED]"], ["LIMIT", 1]]
+  ↳ app/controllers/url_controller.rb:26:in `redirect'
+Completed 404 Not Found in 28ms (Views: 0.2ms | ActiveRecord: 3.1ms | Allocations: 7618)
+
+
+  [1m[36mShortUrl Load (0.3ms)[0m  [1m[34mSELECT "short_urls".* FROM "short_urls" ORDER BY "short_urls"."id" DESC LIMIT ?[0m  [["LIMIT", 1]]
+  [1m[36mShortUrl Load (0.2ms)[0m  [1m[34mSELECT "short_urls".* FROM "short_urls" ORDER BY "short_urls"."id" DESC LIMIT ?[0m  [["LIMIT", 1]]
+Started GET "/url/Z83LL1sv" for 127.0.0.1 at 2026-06-08 14:15:32 +0530
+Processing by UrlController#redirect as */*
+  Parameters: {"code"=>"[FILTERED]"}
+  [1m[36mShortUrl Load (0.2ms)[0m  [1m[34mSELECT "short_urls".* FROM "short_urls" WHERE "short_urls"."code" = ? LIMIT ?[0m  [["code", "[FILTERED]"], ["LIMIT", 1]]
+  ↳ app/controllers/url_controller.rb:26:in `redirect'
+  [1m[36mClick Load (0.1ms)[0m  [1m[34mSELECT "clicks".* FROM "clicks" WHERE "clicks"."short_url_id" = ? LIMIT ?[0m  [["short_url_id", 1], ["LIMIT", 1]]
+  ↳ app/controllers/url_controller.rb:29:in `redirect'
+  [1m[36mClick Update All (1.5ms)[0m  [1m[33mUPDATE "clicks" SET "count" = COALESCE("count", 0) + ? WHERE "clicks"."id" = ?[0m  [["count", 1], ["id", 1]]
+  ↳ app/controllers/url_controller.rb:30:in `redirect'
+Redirected to https://docs.google.com/spreadsheets/d/1_gD3vhda6Q-kd4wfRRDzYYsV2kUlwZWkpYetU7Nfi2M/edit?gid=1973289235#gid=1973289235
+Completed 302 Found in 30ms (ActiveRecord: 2.2ms | Allocations: 13284)
+
+
+Started POST "/url/Z83LL1sv/notify" for 127.0.0.1 at 2026-06-08 14:16:01 +0530
+Processing by UrlController#notify as */*
+  Parameters: {"code"=>"[FILTERED]"}
+  [1m[36mDoorkeeper::AccessToken Load (0.4ms)[0m  [1m[34mSELECT "oauth_access_tokens".* FROM "oauth_access_tokens" WHERE "oauth_access_tokens"."token" = ? LIMIT ?[0m  [["token", "[FILTERED]"], ["LIMIT", 1]]
+  [1m[36mUser Load (0.3ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = ? LIMIT ?[0m  [["id", 1], ["LIMIT", 1]]
+  ↳ app/controllers/url_controller.rb:42:in `set_user'
+  [1m[36mShortUrl Load (0.2ms)[0m  [1m[34mSELECT "short_urls".* FROM "short_urls" WHERE "short_urls"."user_id" = ? AND "short_urls"."code" = ? LIMIT ?[0m  [["user_id", 1], ["code", "[FILTERED]"], ["LIMIT", 1]]
+  ↳ app/controllers/url_controller.rb:17:in `notify'
+  [1m[36mClick Load (0.1ms)[0m  [1m[34mSELECT "clicks".* FROM "clicks" WHERE "clicks"."short_url_id" = ? LIMIT ?[0m  [["short_url_id", 1], ["LIMIT", 1]]
+  ↳ app/models/short_url.rb:8:in `click_count'
+  Rendering layout layouts/mailer.html.erb
+  Rendering short_url_mailer/url_report.html.erb within layouts/mailer
+  Rendered short_url_mailer/url_report.html.erb within layouts/mailer (Duration: 0.6ms | Allocations: 309)
+  Rendered layout layouts/mailer.html.erb (Duration: 1.1ms | Allocations: 572)
+  Rendering layout layouts/mailer.text.erb
+  Rendering short_url_mailer/url_report.text.erb within layouts/mailer
+  Rendered short_url_mailer/url_report.text.erb within layouts/mailer (Duration: 0.5ms | Allocations: 191)
+  Rendered layout layouts/mailer.text.erb (Duration: 0.8ms | Allocations: 387)
+ShortUrlMailer#url_report: processed outbound mail in 56.5ms
+Delivered mail 6a26814af963_48c6318816749@Root-admins-MacBook-Air-62.local.mail (59.0ms)
+Date: Mon, 08 Jun 2026 14:16:02 +0530
+From: gopikasri12@yopmail.com
+To: gopika123@yopmail.com
+Message-ID: <6a26814af963_48c6318816749@Root-admins-MacBook-Air-62.local.mail>
+Subject: Short URL report for Z83LL1sv
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+ boundary="--==_mimepart_6a26814ac490_48c631881666e";
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+
+----==_mimepart_6a26814ac490_48c631881666e
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+Hello gopika123@yopmail.com,
+
+Here are the latest details for your short URL:
+
+Original URL: https://docs.google.com/spreadsheets/d/1_gD3vhda6Q-kd4wfRRDzYYsV2kUlwZWkpYetU7Nfi2M/edit?gid=1973289235#gid=1973289235
+Short URL: http://localhost:3000/url/Z83LL1sv
+Code: Z83LL1sv
+Total clicks: 2
+
+Thank you,
+URL Shortener Team
+
+
+----==_mimepart_6a26814ac490_48c631881666e
+Content-Type: text/html;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <style>
+      /* Email styles need to be inline */
+    </style>
+  </head>
+
+  <body>
+    <h1>Short URL report</h1>
+<p>Hello gopika123@yopmail.com,</p>
+<p>Here are the latest details for your short URL:</p>
+<ul>
+  <li><strong>Original URL:</strong> https://docs.google.com/spreadsheets/d/1_gD3vhda6Q-kd4wfRRDzYYsV2kUlwZWkpYetU7Nfi2M/edit?gid=1973289235#gid=1973289235</li>
+  <li><strong>Short URL:</strong> <a href="http://localhost:3000/url/Z83LL1sv">http://localhost:3000/url/Z83LL1sv</a></li>
+  <li><strong>Code:</strong> Z83LL1sv</li>
+  <li><strong>Total clicks:</strong> 2</li>
+</ul>
+<p>Thank you,<br>URL Shortener Team</p>
+
+  </body>
+</html>
+
+----==_mimepart_6a26814ac490_48c631881666e--
+
+Completed 200 OK in 239ms (Views: 0.2ms | ActiveRecord: 1.8ms | Allocations: 66727)
+
+
+  [1m[36mUser Load (1.3ms)[0m  [1m[34mSELECT "users".* FROM "users" /* loading for pp */ LIMIT ?[0m  [["LIMIT", 11]]
+Started POST "/url/Z83LL1sv/notify" for 127.0.0.1 at 2026-06-08 14:18:51 +0530
+  [1m[36mActiveRecord::SchemaMigration Load (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Processing by UrlController#notify as */*
+  Parameters: {"code"=>"[FILTERED]"}
+  [1m[36mDoorkeeper::AccessToken Load (0.2ms)[0m  [1m[34mSELECT "oauth_access_tokens".* FROM "oauth_access_tokens" WHERE "oauth_access_tokens"."token" = ? LIMIT ?[0m  [["token", "[FILTERED]"], ["LIMIT", 1]]
+  [1m[36mUser Load (0.0ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = ? LIMIT ?[0m  [["id", 1], ["LIMIT", 1]]
+  ↳ app/controllers/url_controller.rb:42:in `set_user'
+  [1m[36mShortUrl Load (0.3ms)[0m  [1m[34mSELECT "short_urls".* FROM "short_urls" WHERE "short_urls"."user_id" = ? AND "short_urls"."code" = ? LIMIT ?[0m  [["user_id", 1], ["code", "[FILTERED]"], ["LIMIT", 1]]
+  ↳ app/controllers/url_controller.rb:17:in `notify'
+  [1m[36mClick Load (0.0ms)[0m  [1m[34mSELECT "clicks".* FROM "clicks" WHERE "clicks"."short_url_id" = ? LIMIT ?[0m  [["short_url_id", 1], ["LIMIT", 1]]
+  ↳ app/models/short_url.rb:8:in `click_count'
+  Rendering layout layouts/mailer.html.erb
+  Rendering short_url_mailer/url_report.html.erb within layouts/mailer
+  Rendered short_url_mailer/url_report.html.erb within layouts/mailer (Duration: 0.3ms | Allocations: 314)
+  Rendered layout layouts/mailer.html.erb (Duration: 0.5ms | Allocations: 578)
+  Rendering layout layouts/mailer.text.erb
+  Rendering short_url_mailer/url_report.text.erb within layouts/mailer
+  Rendered short_url_mailer/url_report.text.erb within layouts/mailer (Duration: 0.1ms | Allocations: 191)
+  Rendered layout layouts/mailer.text.erb (Duration: 0.3ms | Allocations: 387)
+ShortUrlMailer#url_report: processed outbound mail in 20.0ms
+Delivered mail 6a2681f3c11af_4b2e314c3e0@Root-admins-MacBook-Air-62.local.mail (17.5ms)
+Date: Mon, 08 Jun 2026 14:18:51 +0530
+From: gopikasri.muruganandam@rootquotient.com
+To: gopika123@yopmail.com
+Message-ID: <6a2681f3c11af_4b2e314c3e0@Root-admins-MacBook-Air-62.local.mail>
+Subject: Short URL report for Z83LL1sv
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+ boundary="--==_mimepart_6a2681f3bdf36_4b2e314c2b4";
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+
+----==_mimepart_6a2681f3bdf36_4b2e314c2b4
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+Hello gopika123@yopmail.com,
+
+Here are the latest details for your short URL:
+
+Original URL: https://docs.google.com/spreadsheets/d/1_gD3vhda6Q-kd4wfRRDzYYsV2kUlwZWkpYetU7Nfi2M/edit?gid=1973289235#gid=1973289235
+Short URL: http://localhost:3000/url/Z83LL1sv
+Code: Z83LL1sv
+Total clicks: 2
+
+Thank you,
+URL Shortener Team
+
+
+----==_mimepart_6a2681f3bdf36_4b2e314c2b4
+Content-Type: text/html;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <style>
+      /* Email styles need to be inline */
+    </style>
+  </head>
+
+  <body>
+    <h1>Short URL report</h1>
+<p>Hello gopika123@yopmail.com,</p>
+<p>Here are the latest details for your short URL:</p>
+<ul>
+  <li><strong>Original URL:</strong> https://docs.google.com/spreadsheets/d/1_gD3vhda6Q-kd4wfRRDzYYsV2kUlwZWkpYetU7Nfi2M/edit?gid=1973289235#gid=1973289235</li>
+  <li><strong>Short URL:</strong> <a href="http://localhost:3000/url/Z83LL1sv">http://localhost:3000/url/Z83LL1sv</a></li>
+  <li><strong>Code:</strong> Z83LL1sv</li>
+  <li><strong>Total clicks:</strong> 2</li>
+</ul>
+<p>Thank you,<br>URL Shortener Team</p>
+
+  </body>
+</html>
+
+----==_mimepart_6a2681f3bdf36_4b2e314c2b4--
+
+Completed 200 OK in 91ms (Views: 0.1ms | ActiveRecord: 2.0ms | Allocations: 61087)
+
+
